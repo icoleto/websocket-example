@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat WebSocket</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      #messages {
+        border: 1px solid #ccc;
+        height: 300px;
+        overflow-y: scroll;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      input {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat WebSocket</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Escribe un mensaje..." />
+    <button id="sendButton">Enviar</button>
+
+    <script>
+      let username = prompt("Por favor, ingresa tu nombre:") || "Anónimo";
+      const ws = new WebSocket("ws://localhost:8080");
+      const messageInput = document.getElementById("messageInput");
+
+      // Focalizar el input al cargar la página
+      window.onload = () => {
+        messageInput.focus();
+      };
+
+      ws.onmessage = (event) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const { user, text } = JSON.parse(reader.result || event.data);
+          document.getElementById(
+            "messages"
+          ).innerHTML += `<p><strong>${user}:</strong> ${text}</p>`;
+          messages.scrollTop = messages.scrollHeight;
+        };
+        reader.readAsText(
+          event.data instanceof Blob ? event.data : new Blob([event.data])
+        );
+      };
+
+      // Enviar un mensaje al hacer clic en "Enviar" o al presionar "Enter"
+      const sendMessage = () => {
+        const message = messageInput.value;
+        if (message) {
+          ws.send(JSON.stringify({ user: username, text: message }));
+          messageInput.value = "";
+          messageInput.focus(); // Mantener el foco en el input
+        }
+      };
+
+      document.getElementById("sendButton").onclick = sendMessage;
+
+      // Detectar pulsación de la tecla "Enter"
+      messageInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          sendMessage(); // Llamar a la función para enviar el mensaje
+          e.preventDefault(); // Evitar el salto de línea
+        }
+      });
+    </script>
+  </body>
+</html>
