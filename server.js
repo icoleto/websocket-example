@@ -19,6 +19,7 @@ const wss = new Server({ server });
 wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     const { user, text } = JSON.parse(message);
+    console.log(JSON.stringify({ user, text }));
     wss.clients.forEach(
       (client) =>
         client.readyState === ws.OPEN &&
@@ -29,5 +30,9 @@ wss.on("connection", (ws) => {
 });
 
 server.listen(process.env.PORT || 8080, () =>
-  console.log("Servidor en http://localhost:8080")
+  console.log(
+    `"Servidor en: " ${
+      process.env.RENDER_EXTERNAL_URL || "http://localhost:8080"
+    }`
+  )
 );
