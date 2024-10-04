@@ -28,4 +28,6 @@ wss.on("connection", (ws) => {
   ws.send(JSON.stringify({ user: "Sistema", text: "¡Bienvenido al chat!" }));
 });
 
-server.listen(8080, () => console.log("Servidor en http://localhost:8080"));
+server.listen(process.env.PORT || 8080, () =>
+  console.log("Servidor en http://localhost:8080")
+);
